@@ -1,11 +1,23 @@
+[workspace]
+members = [".", "crates/cdio-paranoia-sys", "crates/paranoia"]
+resolver = "3"
+
 [package]
 name = "simple-whipper"
 version = "0.1.0"
 edition = "2024"
+description = "Small iced GUI CD ripper built on libcdio-paranoia"
+license = "MIT"
 
 [dependencies]
-iced = { version = "0.14", features = ["tokio", "canvas", "advanced"] }
-iced_term = "0.8"
+paranoia = { path = "crates/paranoia" }
+iced = { version = "0.14", features = ["tokio"] }
+hound = "3.5"
+flacenc = "0.5"
+rfd = "0.18"
+serde = { version = "1", features = ["derive"] }
+toml = "1"
+dirs = "6"
 
 [profile.release]
 lto = "thin"

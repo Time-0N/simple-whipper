@@ -1,5 +1,5 @@
 {
-  description = "whipper-gui: iced front end for whipper";
+  description = "simple-whipper: iced GUI CD ripper built on libcdio-paranoia";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -15,10 +15,16 @@
         libxkbcommon
         vulkan-loader
         libGL
-        xorg.libX11
-        xorg.libXcursor
-        xorg.libXi
-        xorg.libXrandr
+        libx11
+        libxcursor
+        libxi
+        libxrandr
+      ];
+
+      # C libraries we link against through FFI
+      cdLibs = with pkgs; [
+        libcdio
+        libcdio-paranoia
       ];
     in
     {
@@ -30,11 +36,13 @@
           clippy
           rust-analyzer
           pkg-config
-          whipper # so the buttons can actually spawn it
+          xdg-utils # xdg-open for the "Open folder" button
         ];
-        buildInputs = runtimeLibs ++ [ pkgs.fontconfig ];
+        # sets LIBCLANG_PATH + BINDGEN_EXTRA_CLANG_ARGS (libc headers) for bindgen
+        nativeBuildInputs = [ pkgs.rustPlatform.bindgenHook ];
+        buildInputs = runtimeLibs ++ cdLibs ++ [ pkgs.fontconfig ];
 
-        LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath runtimeLibs;
+        LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (runtimeLibs ++ cdLibs);
         RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
       };
     };
